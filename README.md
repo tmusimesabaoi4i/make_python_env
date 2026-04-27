@@ -4,13 +4,13 @@
 
 Windows の cmd から、以下を簡単に実行するためのスクリプト一式です。
 
-- `make_env.bat --name YYY`  
+- `python_env_tools\make_env.bat --name YYY`  
   → `YYY` という Python 仮想環境を作成し、基本ライブラリをインストールします。
 
-- `update_env.bat --name YYY`  
+- `python_env_tools\update_env.bat --name YYY`  
   → `YYY` 仮想環境内のライブラリを更新します。
 
-- `update_all.bat`  
+- `python_env_tools\update_all.bat`  
   → 可能であれば Python 本体を `winget` で更新し、現在のフォルダ直下にある全仮想環境のライブラリを更新します。
 
 ## ファイル構成
@@ -33,7 +33,7 @@ pip_proxy_example.ini
 ### 1. 仮想環境を作る
 
 ```cmd
-make_env.bat --name YYY
+python_env_tools\make_env.bat --name YYY
 ```
 
 これにより、コマンドを実行したフォルダ直下に `YYY` フォルダが作成されます。
@@ -41,27 +41,27 @@ make_env.bat --name YYY
 ### 2. 仮想環境を有効化する
 
 ```cmd
-YYY\Scripts\activate.bat
+python_env_tools\YYY\Scripts\activate.bat
 ```
 
 ### 3. 仮想環境内のライブラリを更新する
 
 ```cmd
-update_env.bat --name YYY
+python_env_tools\update_env.bat --name YYY
 ```
 
 ### 4. 直下の全仮想環境をまとめて更新する
 
 ```cmd
-update_all.bat
+python_env_tools\update_all.bat
 ```
 
 ### 5. 仮想環境の保存場所を指定する場合
 
 ```cmd
-make_env.bat --name YYY --dir C:\work\venvs\YYY
-update_env.bat --name YYY --dir C:\work\venvs\YYY
-update_all.bat --root C:\work\venvs
+python_env_tools\make_env.bat --name YYY --dir C:\work\venvs\YYY
+python_env_tools\update_env.bat --name YYY --dir C:\work\venvs\YYY
+python_env_tools\update_all.bat --root C:\work\venvs
 ```
 
 ## Python 本体更新について

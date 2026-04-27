@@ -41,7 +41,7 @@ python_env_tools\make_env.bat --name YYY
 ### 2. 仮想環境を有効化する
 
 ```cmd
-python_env_tools\YYY\Scripts\activate.bat
+YYY\Scripts\activate.bat
 ```
 
 ### 3. 仮想環境内のライブラリを更新する

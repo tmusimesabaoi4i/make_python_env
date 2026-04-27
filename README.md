@@ -110,7 +110,46 @@ python_env_tools\update_env.bat --name YYY --dir C:\work\venvs\YYY
 python_env_tools\update_all.bat --root C:\work\venvs
 ```
 
-### 7. 仮想環境を `python_env_tools` フォルダ内に作りたい場合
+### 7. 仮想環境を削除する
+
+仮想環境が不要になった場合は、仮想環境フォルダを削除します。
+
+まず、仮想環境に入っている場合は、先に仮想環境から出ます。
+
+```cmd
+deactivate
+```
+
+その後、仮想環境フォルダを削除します。
+
+たとえば、`C:\work\YYY` に作成された仮想環境を削除する場合は、以下を実行します。
+
+```cmd
+rmdir /s /q YYY
+```
+
+または、フルパスで指定する場合は以下です。
+
+```cmd
+rmdir /s /q C:\work\YYY
+```
+
+`--dir` で仮想環境を `C:\work\venvs\YYY` に作成していた場合は、以下を実行します。
+
+```cmd
+rmdir /s /q C:\work\venvs\YYY
+```
+
+削除後、以下のようにフォルダが存在しないことを確認できます。
+
+```cmd
+dir
+```
+
+注意点として、`rmdir /s /q` は確認なしでフォルダを削除します。  
+必要なファイルが仮想環境フォルダ内にないことを確認してから実行してください。
+
+### 8. 仮想環境を `python_env_tools` フォルダ内に作りたい場合
 
 仮想環境を `python_env_tools` フォルダ内に作りたい場合は、作成時に `--dir` を指定します。
 
@@ -129,6 +168,13 @@ python_env_tools\YYY\Scripts\activate.bat
 ```cmd
 deactivate
 ```
+
+仮想環境を削除する場合は、以下を実行します。
+
+```cmd
+rmdir /s /q python_env_tools\YYY
+```
+
 ## Python 本体更新について
 
 `update_all.bat` は、Windows の `winget` が使える場合のみ Python 本体の更新を試みます。
@@ -259,4 +305,6 @@ trusted-host =
 
 - 業務用PCでは、Python 本体の更新は情報システム部門のルールに従ってください。
 - `update_env.bat` は仮想環境内の全 outdated package を順番に更新します。
+- 仮想環境を削除する場合は、必ず削除対象のフォルダを確認してください。
+- `rmdir /s /q` は確認なしで削除するため、誤って別フォルダを指定しないよう注意してください。
 - 既存環境を壊したくない重要案件では、更新前にフォルダごとコピーするか、新しい仮想環境を作って検証してください。

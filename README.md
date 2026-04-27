@@ -4,11 +4,11 @@
 
 Windows の cmd から、以下を簡単に実行するためのスクリプト一式です。
 
-- `python_env_tools\make_env.bat --name YYY`  
-  → `YYY` という Python 仮想環境を作成し、基本ライブラリをインストールします。
+- `python_env_tools\make_env.bat --name my_env_for_work`  
+  → `my_env_for_work` という Python 仮想環境を作成し、基本ライブラリをインストールします。
 
-- `python_env_tools\update_env.bat --name YYY`  
-  → `YYY` 仮想環境内のライブラリを更新します。
+- `python_env_tools\update_env.bat --name my_env_for_work`  
+  → `my_env_for_work` 仮想環境内のライブラリを更新します。
 
 - `python_env_tools\update_all.bat`  
   → 可能であれば Python 本体を `winget` で更新し、現在のフォルダ直下にある全仮想環境のライブラリを更新します。
@@ -33,10 +33,10 @@ pip_proxy_example.ini
 ### 1. 仮想環境を作る
 
 ```cmd
-python_env_tools\make_env.bat --name YYY
+python_env_tools\make_env.bat --name my_env_for_work
 ```
 
-これにより、コマンドを実行したフォルダ直下に `YYY` フォルダが作成されます。
+これにより、コマンドを実行したフォルダ直下に `my_env_for_work` フォルダが作成されます。
 
 たとえば、以下の場所でコマンドを実行した場合、
 
@@ -47,22 +47,22 @@ C:\work>
 仮想環境は次の場所に作成されます。
 
 ```text
-C:\work\YYY
+C:\work\my_env_for_work
 ```
 
 ### 2. 仮想環境を有効化する
 
 ```cmd
-YYY\Scripts\activate.bat
+my_env_for_work\Scripts\activate.bat
 ```
 
 有効化されると、cmd の行頭に次のように仮想環境名が表示されます。
 
 ```cmd
-(YYY) C:\work>
+(my_env_for_work) C:\work>
 ```
 
-この状態で `python` や `pip` を実行すると、`YYY` 仮想環境内の Python・ライブラリが使われます。
+この状態で `python` や `pip` を実行すると、`my_env_for_work` 仮想環境内の Python・ライブラリが使われます。
 
 ### 3. 仮想環境から出る
 
@@ -72,7 +72,7 @@ YYY\Scripts\activate.bat
 deactivate
 ```
 
-実行後、cmd の行頭から `(YYY)` が消えていれば、仮想環境から出ています。
+実行後、cmd の行頭から `(my_env_for_work)` が消えていれば、仮想環境から出ています。
 
 ```cmd
 C:\work>
@@ -81,7 +81,7 @@ C:\work>
 ### 4. 仮想環境内のライブラリを更新する
 
 ```cmd
-python_env_tools\update_env.bat --name YYY
+python_env_tools\update_env.bat --name my_env_for_work
 ```
 
 ### 5. 直下の全仮想環境をまとめて更新する
@@ -95,13 +95,13 @@ python_env_tools\update_all.bat
 仮想環境を特定のフォルダに作成したい場合は、`--dir` を指定します。
 
 ```cmd
-python_env_tools\make_env.bat --name YYY --dir C:\work\venvs\YYY
+python_env_tools\make_env.bat --name my_env_for_work --dir C:\work\venvs\my_env_for_work
 ```
 
 指定した場所の仮想環境を更新する場合は、同じく `--dir` を指定します。
 
 ```cmd
-python_env_tools\update_env.bat --name YYY --dir C:\work\venvs\YYY
+python_env_tools\update_env.bat --name my_env_for_work --dir C:\work\venvs\my_env_for_work
 ```
 
 複数の仮想環境をまとめて更新する場合は、仮想環境を格納している親フォルダを `--root` で指定します。
@@ -122,22 +122,22 @@ deactivate
 
 その後、仮想環境フォルダを削除します。
 
-たとえば、`C:\work\YYY` に作成された仮想環境を削除する場合は、以下を実行します。
+たとえば、`C:\work\my_env_for_work` に作成された仮想環境を削除する場合は、以下を実行します。
 
 ```cmd
-rmdir /s /q YYY
+rmdir /s /q my_env_for_work
 ```
 
 または、フルパスで指定する場合は以下です。
 
 ```cmd
-rmdir /s /q C:\work\YYY
+rmdir /s /q C:\work\my_env_for_work
 ```
 
-`--dir` で仮想環境を `C:\work\venvs\YYY` に作成していた場合は、以下を実行します。
+`--dir` で仮想環境を `C:\work\venvs\my_env_for_work` に作成していた場合は、以下を実行します。
 
 ```cmd
-rmdir /s /q C:\work\venvs\YYY
+rmdir /s /q C:\work\venvs\my_env_for_work
 ```
 
 削除後、以下のようにフォルダが存在しないことを確認できます。
@@ -154,13 +154,13 @@ dir
 仮想環境を `python_env_tools` フォルダ内に作りたい場合は、作成時に `--dir` を指定します。
 
 ```cmd
-python_env_tools\make_env.bat --name YYY --dir python_env_tools\YYY
+python_env_tools\make_env.bat --name my_env_for_work --dir python_env_tools\my_env_for_work
 ```
 
 この場合、有効化コマンドは次のとおりです。
 
 ```cmd
-python_env_tools\YYY\Scripts\activate.bat
+python_env_tools\my_env_for_work\Scripts\activate.bat
 ```
 
 仮想環境から出る場合は、同じく以下です。
@@ -172,7 +172,7 @@ deactivate
 仮想環境を削除する場合は、以下を実行します。
 
 ```cmd
-rmdir /s /q python_env_tools\YYY
+rmdir /s /q python_env_tools\my_env_for_work
 ```
 
 ## Python 本体更新について

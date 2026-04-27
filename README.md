@@ -282,6 +282,32 @@ trusted-host =
 | `ipykernel` | Jupyter Notebook から仮想環境を選択可能にする |
 | `jupyterlab` | ブラウザ上で Python を実行できる開発環境 |
 
+### グラフ・可視化
+
+| ライブラリ | 用途 |
+|---|---|
+| `matplotlib` | 基本的なグラフ作成、可視化 |
+| `plotly` | インタラクティブなグラフ作成 |
+| `altair` | 宣言的なグラフ作成、統計可視化 |
+
+### UI・簡易アプリ作成
+
+| ライブラリ | 用途 |
+|---|---|
+| `streamlit` | Pythonだけで簡易Webアプリ・ダッシュボードを作成 |
+| `gradio` | 入力フォーム付きの簡易UI・デモ画面を作成 |
+| `dash` | Plotly ベースのWebダッシュボード作成 |
+
+### SQL・データベース接続
+
+| ライブラリ | 用途 |
+|---|---|
+| `sqlalchemy` | 各種データベースに共通的に接続するためのSQL/ORMライブラリ |
+| `sqlparse` | SQL文の整形・解析 |
+| `pyodbc` | ODBC経由でSQL Server、Access等に接続 |
+| `pymysql` | MySQL/MariaDB に接続 |
+| `psycopg` | PostgreSQL に接続 |
+
 ### 用途別まとめ
 
 | 用途 | 主なライブラリ |
@@ -293,7 +319,9 @@ trusted-host =
 | PowerPoint処理 | `python-pptx` |
 | Web取得 | `requests`, `beautifulsoup4`, `lxml` |
 | HTML生成 | `jinja2`, `markdownify` |
-| グラフ作成 | `matplotlib` |
+| グラフ作成 | `matplotlib`, `plotly`, `altair` |
+| 簡易UI・ダッシュボード | `streamlit`, `gradio`, `dash` |
+| SQL・DB接続 | `sqlalchemy`, `sqlparse`, `pyodbc`, `pymysql`, `psycopg` |
 | Notebook利用 | `ipykernel`, `jupyterlab` |
 | 業務自動化補助 | `tqdm`, `python-dotenv`, `tenacity` |
 

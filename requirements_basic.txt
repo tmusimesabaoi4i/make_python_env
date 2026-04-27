@@ -1,0 +1,40 @@
+# Basic business-use Python packages
+# Edit this file when you want to add/remove default packages.
+
+# installer / build basics
+pip
+setuptools
+wheel
+
+# HTTP / scraping / utility
+requests
+beautifulsoup4
+lxml
+tqdm
+python-dotenv
+tenacity
+charset-normalizer
+
+# data / Excel / database
+pandas
+numpy
+openpyxl
+xlsxwriter
+duckdb
+pyarrow
+
+# documents / PDF / Office
+pypdf
+pymupdf
+pdfplumber
+python-docx
+python-pptx
+
+# HTML / reporting
+jinja2
+markdownify
+matplotlib
+
+# notebook / Jupyter
+ipykernel
+jupyterlab

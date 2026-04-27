@@ -38,32 +38,97 @@ python_env_tools\make_env.bat --name YYY
 
 これにより、コマンドを実行したフォルダ直下に `YYY` フォルダが作成されます。
 
+たとえば、以下の場所でコマンドを実行した場合、
+
+```cmd
+C:\work>
+```
+
+仮想環境は次の場所に作成されます。
+
+```text
+C:\work\YYY
+```
+
 ### 2. 仮想環境を有効化する
 
 ```cmd
 YYY\Scripts\activate.bat
 ```
 
-### 3. 仮想環境内のライブラリを更新する
+有効化されると、cmd の行頭に次のように仮想環境名が表示されます。
+
+```cmd
+(YYY) C:\work>
+```
+
+この状態で `python` や `pip` を実行すると、`YYY` 仮想環境内の Python・ライブラリが使われます。
+
+### 3. 仮想環境から出る
+
+仮想環境の利用を終了する場合は、以下を実行します。
+
+```cmd
+deactivate
+```
+
+実行後、cmd の行頭から `(YYY)` が消えていれば、仮想環境から出ています。
+
+```cmd
+C:\work>
+```
+
+### 4. 仮想環境内のライブラリを更新する
 
 ```cmd
 python_env_tools\update_env.bat --name YYY
 ```
 
-### 4. 直下の全仮想環境をまとめて更新する
+### 5. 直下の全仮想環境をまとめて更新する
 
 ```cmd
 python_env_tools\update_all.bat
 ```
 
-### 5. 仮想環境の保存場所を指定する場合
+### 6. 仮想環境の保存場所を指定する場合
+
+仮想環境を特定のフォルダに作成したい場合は、`--dir` を指定します。
 
 ```cmd
 python_env_tools\make_env.bat --name YYY --dir C:\work\venvs\YYY
+```
+
+指定した場所の仮想環境を更新する場合は、同じく `--dir` を指定します。
+
+```cmd
 python_env_tools\update_env.bat --name YYY --dir C:\work\venvs\YYY
+```
+
+複数の仮想環境をまとめて更新する場合は、仮想環境を格納している親フォルダを `--root` で指定します。
+
+```cmd
 python_env_tools\update_all.bat --root C:\work\venvs
 ```
 
+### 7. 仮想環境を `python_env_tools` フォルダ内に作りたい場合
+
+仮想環境を `python_env_tools` フォルダ内に作りたい場合は、作成時に `--dir` を指定します。
+
+```cmd
+python_env_tools\make_env.bat --name YYY --dir python_env_tools\YYY
+```
+
+この場合、有効化コマンドは次のとおりです。
+
+```cmd
+python_env_tools\YYY\Scripts\activate.bat
+```
+
+仮想環境から出る場合は、同じく以下です。
+
+```cmd
+deactivate
+```
 ## Python 本体更新について
 
 `update_all.bat` は、Windows の `winget` が使える場合のみ Python 本体の更新を試みます。
@@ -110,6 +175,85 @@ trusted-host =
 ```
 
 ※ パスワードを平文保存する運用は、社内ルールに従ってください。
+
+## インストールされるライブラリ一覧
+
+`make_env.bat` 実行時には、`requirements_basic.txt` に定義された以下のライブラリがインストールされます。
+
+### 基本・インストール補助
+
+| ライブラリ | 用途 |
+|---|---|
+| `pip` | Python パッケージのインストール・管理 |
+| `setuptools` | Python パッケージのビルド・管理 |
+| `wheel` | Python パッケージの配布形式対応 |
+
+### HTTP通信・Web取得・スクレイピング補助
+
+| ライブラリ | 用途 |
+|---|---|
+| `requests` | Webページ・ファイルの取得、HTTP通信 |
+| `beautifulsoup4` | HTML/XML の解析 |
+| `lxml` | 高速な HTML/XML パーサー |
+| `charset-normalizer` | 文字コード判定・文字化け対策 |
+| `tqdm` | 処理状況をプログレスバーで表示 |
+| `python-dotenv` | `.env` ファイルから環境変数を読み込み |
+| `tenacity` | リトライ処理、再実行制御 |
+
+### Excel・データ処理・データベース
+
+| ライブラリ | 用途 |
+|---|---|
+| `pandas` | 表形式データの処理、CSV/Excel 処理 |
+| `numpy` | 数値計算、配列処理 |
+| `openpyxl` | Excel `.xlsx` ファイルの読み書き |
+| `xlsxwriter` | Excel `.xlsx` ファイルの作成 |
+| `duckdb` | 大きめの CSV/Parquet 分析、SQL処理 |
+| `pyarrow` | Parquet、Arrow 形式のデータ処理 |
+
+### PDF・Office文書処理
+
+| ライブラリ | 用途 |
+|---|---|
+| `pypdf` | PDF の結合、分割、テキスト抽出 |
+| `pymupdf` | PDF の高速処理、ページ画像化、テキスト抽出 |
+| `pdfplumber` | PDF 内の表・テキスト抽出 |
+| `python-docx` | Word `.docx` ファイルの読み書き |
+| `python-pptx` | PowerPoint `.pptx` ファイルの読み書き |
+
+### HTML・レポート作成・可視化
+
+| ライブラリ | 用途 |
+|---|---|
+| `jinja2` | HTMLテンプレート生成 |
+| `markdownify` | HTML から Markdown への変換 |
+| `matplotlib` | グラフ作成、可視化 |
+
+### Notebook・対話実行環境
+
+| ライブラリ | 用途 |
+|---|---|
+| `ipykernel` | Jupyter Notebook から仮想環境を選択可能にする |
+| `jupyterlab` | ブラウザ上で Python を実行できる開発環境 |
+
+### 用途別まとめ
+
+| 用途 | 主なライブラリ |
+|---|---|
+| Excel処理 | `pandas`, `openpyxl`, `xlsxwriter` |
+| CSV・大容量データ分析 | `pandas`, `duckdb`, `pyarrow` |
+| PDF処理 | `pypdf`, `pymupdf`, `pdfplumber` |
+| Word処理 | `python-docx` |
+| PowerPoint処理 | `python-pptx` |
+| Web取得 | `requests`, `beautifulsoup4`, `lxml` |
+| HTML生成 | `jinja2`, `markdownify` |
+| グラフ作成 | `matplotlib` |
+| Notebook利用 | `ipykernel`, `jupyterlab` |
+| 業務自動化補助 | `tqdm`, `python-dotenv`, `tenacity` |
+
+不要なライブラリがある場合は、`requirements_basic.txt` から削除してから `make_env.bat` を実行してください。
+
+追加したいライブラリがある場合は、`requirements_basic.txt` にライブラリ名を1行ずつ追加してください。
 
 ## 注意
 

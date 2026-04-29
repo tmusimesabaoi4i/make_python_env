@@ -74,7 +74,17 @@ update_env.bat --name YYY --proxy http://proxy.example.com:8080
 update_all.bat --proxy http://proxy.example.com:8080
 ```
 
-認証が必要な場合:
+### 7. プロキシ認証が必要な場合
+
+`--user` と `--pwd` オプションでユーザー名とパスワードを別々に指定できます。`DOMAIN\username` 形式にも対応しています。
+
+```cmd
+make_env.bat --name YYY --proxy http://proxy.example.com:8080 --user DOMAIN\username --pwd password
+update_env.bat --name YYY --proxy http://proxy.example.com:8080 --user DOMAIN\username --pwd password
+update_all.bat --proxy http://proxy.example.com:8080 --user DOMAIN\username --pwd password
+```
+
+従来どおり、URL に直接埋め込む形式も使用できます:
 
 ```cmd
 make_env.bat --name YYY --proxy http://user:password@proxy.example.com:8080
@@ -115,6 +125,12 @@ make_env.bat --name YYY --proxy http://user:password@proxy.example.com:8080
 make_env.bat --name YYY --proxy http://proxy.example.com:8080
 update_env.bat --name YYY --proxy http://proxy.example.com:8080
 update_all.bat --proxy http://proxy.example.com:8080
+```
+
+認証が必要な場合は `--user` と `--pwd` を追加します:
+
+```cmd
+make_env.bat --name YYY --proxy http://proxy.example.com:8080 --user DOMAIN\username --pwd password
 ```
 
 ### 方法2: pip 設定ファイルで恒久的に設定

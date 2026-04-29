@@ -5,6 +5,8 @@ ROOT="$PWD"
 INCLUDE_GLOBAL=0
 SKIP_PYTHON=0
 PROXY=""
+PROXY_USER=""
+PROXY_PWD=""
 
 usage() {
   cat <<'EOF'
@@ -16,12 +18,15 @@ Options:
   --include-global     Optional. Also update global user-site packages.
   --skip-python        Optional. Skip Python executable update attempt.
   --proxy URL          Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+  --user USERNAME      Optional. Proxy username. Example: DOMAIN\\username
+  --pwd PASSWORD       Optional. Proxy password.
 
 Examples:
   ./update_all.sh
   ./update_all.sh --root ~/venvs
   ./update_all.sh --include-global
   ./update_all.sh --proxy http://proxy.example.com:8080
+  ./update_all.sh --proxy http://proxy.example.com:8080 --user 'DOMAIN\user' --pwd secret
 EOF
 }
 
@@ -31,6 +36,8 @@ while [[ $# -gt 0 ]]; do
     --include-global) INCLUDE_GLOBAL=1; shift ;;
     --skip-python) SKIP_PYTHON=1; shift ;;
     --proxy) PROXY="${2:-}"; shift 2 ;;
+    --user) PROXY_USER="${2:-}"; shift 2 ;;
+    --pwd) PROXY_PWD="${2:-}"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) echo "[ERROR] Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -48,10 +55,21 @@ fi
 
 PIP_PROXY_OPT=""
 PROXY_ARG=""
+PROXY_DISPLAY=""
 if [[ -n "$PROXY" ]]; then
-  PIP_PROXY_OPT="--proxy $PROXY"
-  PROXY_ARG="--proxy $PROXY"
-  echo "Proxy: $PROXY"
+  if [[ -n "$PROXY_USER" ]]; then
+    PROTO="${PROXY%%://*}"
+    HOST_PORT="${PROXY#*://}"
+    FULL_PROXY="${PROTO}://${PROXY_USER}:${PROXY_PWD}@${HOST_PORT}"
+    PIP_PROXY_OPT="--proxy $FULL_PROXY"
+    PROXY_ARG="--proxy $PROXY --user $PROXY_USER --pwd $PROXY_PWD"
+    PROXY_DISPLAY="${PROTO}://${PROXY_USER}:****@${HOST_PORT}"
+  else
+    PIP_PROXY_OPT="--proxy $PROXY"
+    PROXY_ARG="--proxy $PROXY"
+    PROXY_DISPLAY="$PROXY"
+  fi
+  echo "Proxy: $PROXY_DISPLAY"
 fi
 
 if [[ "$INCLUDE_GLOBAL" -eq 1 ]]; then

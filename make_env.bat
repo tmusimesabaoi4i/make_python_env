@@ -7,6 +7,8 @@ set "ENV_DIR="
 set "REQ_FILE=%~dp0requirements_basic.txt"
 set "PYTHON_CMD="
 set "PROXY="
+set "PROXY_USER="
+set "PROXY_PWD="
 
 :parse_args
 if "%~1"=="" goto parsed
@@ -40,6 +42,18 @@ if /I "%~1"=="--proxy" (
     shift
     goto parse_args
 )
+if /I "%~1"=="--user" (
+    set "PROXY_USER=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--pwd" (
+    set "PROXY_PWD=%~2"
+    shift
+    shift
+    goto parse_args
+)
 if /I "%~1"=="--help" goto help
 echo [ERROR] Unknown option: %~1
 goto help
@@ -67,7 +81,22 @@ if not defined PYTHON_CMD (
 )
 
 set "PIP_PROXY_OPT="
-if defined PROXY set "PIP_PROXY_OPT=--proxy %PROXY%"
+set "PROXY_DISPLAY="
+if defined PROXY (
+    if defined PROXY_USER (
+        for /f "tokens=1,2 delims=/" %%A in ("!PROXY!") do (
+            set "PROTO=%%A"
+            set "REST=%%B"
+        )
+        set "REST=!REST:~1!"
+        set "FULL_PROXY=!PROTO!//!PROXY_USER!:!PROXY_PWD!@!REST!"
+        set "PIP_PROXY_OPT=--proxy !FULL_PROXY!"
+        set "PROXY_DISPLAY=!PROTO!//!PROXY_USER!:****@!REST!"
+    ) else (
+        set "PIP_PROXY_OPT=--proxy %PROXY%"
+        set "PROXY_DISPLAY=%PROXY%"
+    )
+)
 
 echo.
 echo ============================================================
@@ -75,7 +104,7 @@ echo Create Python virtual environment
 echo   Name  : %ENV_NAME%
 echo   Path  : %ENV_DIR%
 echo   Req   : %REQ_FILE%
-if defined PROXY echo   Proxy : %PROXY%
+if defined PROXY echo   Proxy : !PROXY_DISPLAY!
 echo ============================================================
 echo.
 
@@ -141,11 +170,14 @@ echo   --dir  PATH                  Optional. Environment path. Default: current
 echo   --requirements PATH          Optional. Requirements file. Default: requirements_basic.txt next to this bat.
 echo   --python "COMMAND"           Optional. Python command. Example: "py -3.12" or "C:\Python312\python.exe"
 echo   --proxy URL                  Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+echo   --user USERNAME              Optional. Proxy username. Example: DOMAIN\username
+echo   --pwd PASSWORD               Optional. Proxy password.
 echo.
 echo Examples:
 echo   make_env.bat --name YYY
 echo   make_env.bat --name YYY --dir C:\work\venvs\YYY
 echo   make_env.bat --name YYY --python "py -3.12"
 echo   make_env.bat --name YYY --proxy http://proxy.example.com:8080
+echo   make_env.bat --name YYY --proxy http://proxy.example.com:8080 --user DOMAIN\user --pwd secret
 echo.
 exit /b 1

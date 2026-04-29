@@ -4,6 +4,8 @@ set -euo pipefail
 ENV_NAME=""
 ENV_DIR=""
 PROXY=""
+PROXY_USER=""
+PROXY_PWD=""
 
 usage() {
   cat <<'EOF'
@@ -14,11 +16,14 @@ Options:
   --name ENV_NAME    Required. Virtual environment name.
   --dir PATH         Optional. Environment path. Default: current folder/ENV_NAME
   --proxy URL        Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+  --user USERNAME    Optional. Proxy username. Example: DOMAIN\\username
+  --pwd PASSWORD     Optional. Proxy password.
 
 Examples:
   ./update_env.sh --name YYY
   ./update_env.sh --name YYY --dir ~/venvs/YYY
   ./update_env.sh --name YYY --proxy http://proxy.example.com:8080
+  ./update_env.sh --name YYY --proxy http://proxy.example.com:8080 --user 'DOMAIN\user' --pwd secret
 EOF
 }
 
@@ -27,6 +32,8 @@ while [[ $# -gt 0 ]]; do
     --name) ENV_NAME="${2:-}"; shift 2 ;;
     --dir) ENV_DIR="${2:-}"; shift 2 ;;
     --proxy) PROXY="${2:-}"; shift 2 ;;
+    --user) PROXY_USER="${2:-}"; shift 2 ;;
+    --pwd) PROXY_PWD="${2:-}"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) echo "[ERROR] Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -49,9 +56,19 @@ if [[ ! -x "$PY" ]]; then
 fi
 
 PIP_PROXY_OPT=""
+PROXY_DISPLAY=""
 if [[ -n "$PROXY" ]]; then
-  PIP_PROXY_OPT="--proxy $PROXY"
-  echo "Proxy: $PROXY"
+  if [[ -n "$PROXY_USER" ]]; then
+    PROTO="${PROXY%%://*}"
+    HOST_PORT="${PROXY#*://}"
+    FULL_PROXY="${PROTO}://${PROXY_USER}:${PROXY_PWD}@${HOST_PORT}"
+    PIP_PROXY_OPT="--proxy $FULL_PROXY"
+    PROXY_DISPLAY="${PROTO}://${PROXY_USER}:****@${HOST_PORT}"
+  else
+    PIP_PROXY_OPT="--proxy $PROXY"
+    PROXY_DISPLAY="$PROXY"
+  fi
+  echo "Proxy: $PROXY_DISPLAY"
 fi
 
 "$PY" -m pip install --upgrade $PIP_PROXY_OPT pip setuptools wheel

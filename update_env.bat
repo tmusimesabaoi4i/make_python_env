@@ -5,6 +5,8 @@ setlocal EnableExtensions EnableDelayedExpansion
 set "ENV_NAME="
 set "ENV_DIR="
 set "PROXY="
+set "PROXY_USER="
+set "PROXY_PWD="
 
 :parse_args
 if "%~1"=="" goto parsed
@@ -22,6 +24,18 @@ if /I "%~1"=="--dir" (
 )
 if /I "%~1"=="--proxy" (
     set "PROXY=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--user" (
+    set "PROXY_USER=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--pwd" (
+    set "PROXY_PWD=%~2"
     shift
     shift
     goto parse_args
@@ -49,14 +63,29 @@ if not exist "%VENV_PY%" (
 )
 
 set "PIP_PROXY_OPT="
-if defined PROXY set "PIP_PROXY_OPT=--proxy %PROXY%"
+set "PROXY_DISPLAY="
+if defined PROXY (
+    if defined PROXY_USER (
+        for /f "tokens=1,2 delims=/" %%A in ("!PROXY!") do (
+            set "PROTO=%%A"
+            set "REST=%%B"
+        )
+        set "REST=!REST:~1!"
+        set "FULL_PROXY=!PROTO!//!PROXY_USER!:!PROXY_PWD!@!REST!"
+        set "PIP_PROXY_OPT=--proxy !FULL_PROXY!"
+        set "PROXY_DISPLAY=!PROTO!//!PROXY_USER!:****@!REST!"
+    ) else (
+        set "PIP_PROXY_OPT=--proxy %PROXY%"
+        set "PROXY_DISPLAY=%PROXY%"
+    )
+)
 
 echo.
 echo ============================================================
 echo Update Python packages in virtual environment
 echo   Name  : %ENV_NAME%
 echo   Path  : %ENV_DIR%
-if defined PROXY echo   Proxy : %PROXY%
+if defined PROXY echo   Proxy : !PROXY_DISPLAY!
 echo ============================================================
 echo.
 
@@ -104,10 +133,13 @@ echo Options:
 echo   --name ENV_NAME     Required. Virtual environment name.
 echo   --dir  PATH         Optional. Environment path. Default: current folder\ENV_NAME
 echo   --proxy URL         Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+echo   --user USERNAME     Optional. Proxy username. Example: DOMAIN\username
+echo   --pwd PASSWORD      Optional. Proxy password.
 echo.
 echo Examples:
 echo   update_env.bat --name YYY
 echo   update_env.bat --name YYY --dir C:\work\venvs\YYY
 echo   update_env.bat --name YYY --proxy http://proxy.example.com:8080
+echo   update_env.bat --name YYY --proxy http://proxy.example.com:8080 --user DOMAIN\user --pwd secret
 echo.
 exit /b 1

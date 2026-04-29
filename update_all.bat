@@ -6,6 +6,8 @@ set "ROOT=%CD%"
 set "INCLUDE_GLOBAL=0"
 set "SKIP_PYTHON=0"
 set "PROXY="
+set "PROXY_USER="
+set "PROXY_PWD="
 
 :parse_args
 if "%~1"=="" goto parsed
@@ -31,6 +33,18 @@ if /I "%~1"=="--proxy" (
     shift
     goto parse_args
 )
+if /I "%~1"=="--user" (
+    set "PROXY_USER=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--pwd" (
+    set "PROXY_PWD=%~2"
+    shift
+    shift
+    goto parse_args
+)
 if /I "%~1"=="--help" goto help
 echo [ERROR] Unknown option: %~1
 goto help
@@ -38,9 +52,23 @@ goto help
 :parsed
 set "PIP_PROXY_OPT="
 set "PROXY_ARG="
+set "PROXY_DISPLAY="
 if defined PROXY (
-    set "PIP_PROXY_OPT=--proxy %PROXY%"
-    set "PROXY_ARG=--proxy %PROXY%"
+    if defined PROXY_USER (
+        for /f "tokens=1,2 delims=/" %%A in ("!PROXY!") do (
+            set "PROTO=%%A"
+            set "REST=%%B"
+        )
+        set "REST=!REST:~1!"
+        set "FULL_PROXY=!PROTO!//!PROXY_USER!:!PROXY_PWD!@!REST!"
+        set "PIP_PROXY_OPT=--proxy !FULL_PROXY!"
+        set "PROXY_ARG=--proxy !PROXY! --user !PROXY_USER! --pwd !PROXY_PWD!"
+        set "PROXY_DISPLAY=!PROTO!//!PROXY_USER!:****@!REST!"
+    ) else (
+        set "PIP_PROXY_OPT=--proxy %PROXY%"
+        set "PROXY_ARG=--proxy %PROXY%"
+        set "PROXY_DISPLAY=%PROXY%"
+    )
 )
 
 echo.
@@ -48,7 +76,7 @@ echo ============================================================
 echo Update Python itself if possible, then update all venvs
 echo   Root           : %ROOT%
 echo   Include global : %INCLUDE_GLOBAL%
-if defined PROXY echo   Proxy          : %PROXY%
+if defined PROXY echo   Proxy          : !PROXY_DISPLAY!
 echo ============================================================
 echo.
 
@@ -148,6 +176,8 @@ echo   --root PATH          Optional. Folder containing venv folders. Default: c
 echo   --include-global     Optional. Also update global user-site packages.
 echo   --skip-python        Optional. Skip Python executable update attempt.
 echo   --proxy URL          Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+echo   --user USERNAME      Optional. Proxy username. Example: DOMAIN\username
+echo   --pwd PASSWORD       Optional. Proxy password.
 echo.
 echo Examples:
 echo   update_all.bat
@@ -155,5 +185,6 @@ echo   update_all.bat --root C:\work\venvs
 echo   update_all.bat --include-global
 echo   update_all.bat --skip-python
 echo   update_all.bat --proxy http://proxy.example.com:8080
+echo   update_all.bat --proxy http://proxy.example.com:8080 --user DOMAIN\user --pwd secret
 echo.
 exit /b 1

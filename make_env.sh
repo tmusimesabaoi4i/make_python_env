@@ -6,6 +6,8 @@ ENV_DIR=""
 REQ_FILE="$(cd "$(dirname "$0")" && pwd)/requirements_basic.txt"
 PYTHON_CMD=""
 PROXY=""
+PROXY_USER=""
+PROXY_PWD=""
 
 usage() {
   cat <<'EOF'
@@ -18,11 +20,14 @@ Options:
   --requirements PATH   Optional. Requirements file.
   --python COMMAND      Optional. Python command. Example: python3.12
   --proxy URL           Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
+  --user USERNAME       Optional. Proxy username. Example: DOMAIN\\username
+  --pwd PASSWORD        Optional. Proxy password.
 
 Examples:
   ./make_env.sh --name YYY
   ./make_env.sh --name YYY --dir ~/venvs/YYY
   ./make_env.sh --name YYY --proxy http://proxy.example.com:8080
+  ./make_env.sh --name YYY --proxy http://proxy.example.com:8080 --user 'DOMAIN\user' --pwd secret
 EOF
 }
 
@@ -33,6 +38,8 @@ while [[ $# -gt 0 ]]; do
     --requirements) REQ_FILE="${2:-}"; shift 2 ;;
     --python) PYTHON_CMD="${2:-}"; shift 2 ;;
     --proxy) PROXY="${2:-}"; shift 2 ;;
+    --user) PROXY_USER="${2:-}"; shift 2 ;;
+    --pwd) PROXY_PWD="${2:-}"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) echo "[ERROR] Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -60,13 +67,23 @@ if [[ -z "$PYTHON_CMD" ]]; then
 fi
 
 PIP_PROXY_OPT=""
+PROXY_DISPLAY=""
 if [[ -n "$PROXY" ]]; then
-  PIP_PROXY_OPT="--proxy $PROXY"
+  if [[ -n "$PROXY_USER" ]]; then
+    PROTO="${PROXY%%://*}"
+    HOST_PORT="${PROXY#*://}"
+    FULL_PROXY="${PROTO}://${PROXY_USER}:${PROXY_PWD}@${HOST_PORT}"
+    PIP_PROXY_OPT="--proxy $FULL_PROXY"
+    PROXY_DISPLAY="${PROTO}://${PROXY_USER}:****@${HOST_PORT}"
+  else
+    PIP_PROXY_OPT="--proxy $PROXY"
+    PROXY_DISPLAY="$PROXY"
+  fi
 fi
 
 echo "Create venv: $ENV_DIR"
 if [[ -n "$PROXY" ]]; then
-  echo "Proxy: $PROXY"
+  echo "Proxy: $PROXY_DISPLAY"
 fi
 
 if [[ -x "$ENV_DIR/bin/python" ]]; then

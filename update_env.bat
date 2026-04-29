@@ -4,6 +4,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 set "ENV_NAME="
 set "ENV_DIR="
+set "PROXY="
 
 :parse_args
 if "%~1"=="" goto parsed
@@ -15,6 +16,12 @@ if /I "%~1"=="--name" (
 )
 if /I "%~1"=="--dir" (
     set "ENV_DIR=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--proxy" (
+    set "PROXY=%~2"
     shift
     shift
     goto parse_args
@@ -41,15 +48,19 @@ if not exist "%VENV_PY%" (
     exit /b 1
 )
 
+set "PIP_PROXY_OPT="
+if defined PROXY set "PIP_PROXY_OPT=--proxy %PROXY%"
+
 echo.
 echo ============================================================
 echo Update Python packages in virtual environment
-echo   Name : %ENV_NAME%
-echo   Path : %ENV_DIR%
+echo   Name  : %ENV_NAME%
+echo   Path  : %ENV_DIR%
+if defined PROXY echo   Proxy : %PROXY%
 echo ============================================================
 echo.
 
-"%VENV_PY%" -m pip install --upgrade pip setuptools wheel
+"%VENV_PY%" -m pip install --upgrade %PIP_PROXY_OPT% pip setuptools wheel
 if errorlevel 1 (
     echo [ERROR] Failed to update pip/setuptools/wheel.
     exit /b 1
@@ -61,9 +72,9 @@ echo.
 
 set "UPDATED_COUNT=0"
 
-for /f "skip=2 tokens=1" %%P in ('"%VENV_PY%" -m pip list --outdated 2^>nul') do (
+for /f "skip=2 tokens=1" %%P in ('"%VENV_PY%" -m pip list %PIP_PROXY_OPT% --outdated 2^>nul') do (
     echo Updating %%P ...
-    "%VENV_PY%" -m pip install --upgrade "%%P"
+    "%VENV_PY%" -m pip install --upgrade %PIP_PROXY_OPT% "%%P"
     if errorlevel 1 (
         echo [WARN] Failed to update %%P
     ) else (
@@ -92,9 +103,11 @@ echo.
 echo Options:
 echo   --name ENV_NAME     Required. Virtual environment name.
 echo   --dir  PATH         Optional. Environment path. Default: current folder\ENV_NAME
+echo   --proxy URL         Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
 echo.
 echo Examples:
 echo   update_env.bat --name YYY
 echo   update_env.bat --name YYY --dir C:\work\venvs\YYY
+echo   update_env.bat --name YYY --proxy http://proxy.example.com:8080
 echo.
 exit /b 1

@@ -5,6 +5,7 @@ ENV_NAME=""
 ENV_DIR=""
 REQ_FILE="$(cd "$(dirname "$0")" && pwd)/requirements_basic.txt"
 PYTHON_CMD=""
+PROXY=""
 
 usage() {
   cat <<'EOF'
@@ -16,10 +17,12 @@ Options:
   --dir PATH            Optional. Environment path. Default: current folder/ENV_NAME
   --requirements PATH   Optional. Requirements file.
   --python COMMAND      Optional. Python command. Example: python3.12
+  --proxy URL           Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
 
 Examples:
   ./make_env.sh --name YYY
   ./make_env.sh --name YYY --dir ~/venvs/YYY
+  ./make_env.sh --name YYY --proxy http://proxy.example.com:8080
 EOF
 }
 
@@ -29,6 +32,7 @@ while [[ $# -gt 0 ]]; do
     --dir) ENV_DIR="${2:-}"; shift 2 ;;
     --requirements) REQ_FILE="${2:-}"; shift 2 ;;
     --python) PYTHON_CMD="${2:-}"; shift 2 ;;
+    --proxy) PROXY="${2:-}"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) echo "[ERROR] Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -55,7 +59,15 @@ if [[ -z "$PYTHON_CMD" ]]; then
   fi
 fi
 
+PIP_PROXY_OPT=""
+if [[ -n "$PROXY" ]]; then
+  PIP_PROXY_OPT="--proxy $PROXY"
+fi
+
 echo "Create venv: $ENV_DIR"
+if [[ -n "$PROXY" ]]; then
+  echo "Proxy: $PROXY"
+fi
 
 if [[ -x "$ENV_DIR/bin/python" ]]; then
   echo "[ERROR] The virtual environment already exists: $ENV_DIR"
@@ -63,12 +75,12 @@ if [[ -x "$ENV_DIR/bin/python" ]]; then
 fi
 
 $PYTHON_CMD -m venv "$ENV_DIR"
-"$ENV_DIR/bin/python" -m pip install --upgrade pip setuptools wheel
+"$ENV_DIR/bin/python" -m pip install --upgrade $PIP_PROXY_OPT pip setuptools wheel
 
 if [[ -f "$REQ_FILE" ]]; then
-  "$ENV_DIR/bin/python" -m pip install --upgrade -r "$REQ_FILE"
+  "$ENV_DIR/bin/python" -m pip install --upgrade $PIP_PROXY_OPT -r "$REQ_FILE"
 else
-  "$ENV_DIR/bin/python" -m pip install --upgrade requests beautifulsoup4 lxml tqdm python-dotenv tenacity pandas numpy openpyxl xlsxwriter duckdb pyarrow matplotlib jinja2 markdownify pypdf pymupdf pdfplumber python-docx python-pptx ipykernel jupyterlab
+  "$ENV_DIR/bin/python" -m pip install --upgrade $PIP_PROXY_OPT requests beautifulsoup4 lxml tqdm python-dotenv tenacity pandas numpy openpyxl xlsxwriter duckdb pyarrow matplotlib jinja2 markdownify pypdf pymupdf pdfplumber python-docx python-pptx ipykernel jupyterlab
 fi
 
 "$ENV_DIR/bin/python" -m ipykernel install --user --name "$ENV_NAME" --display-name "Python ($ENV_NAME)" >/dev/null 2>&1 || true

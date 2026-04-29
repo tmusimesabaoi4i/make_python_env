@@ -23,13 +23,6 @@ xlsxwriter
 duckdb
 pyarrow
 
-# SQL / database connection
-sqlalchemy
-sqlparse
-pyodbc
-pymysql
-psycopg[binary]
-
 # documents / PDF / Office
 pypdf
 pymupdf
@@ -40,16 +33,7 @@ python-pptx
 # HTML / reporting
 jinja2
 markdownify
-
-# visualization
 matplotlib
-plotly
-altair
-
-# UI / dashboard
-streamlit
-gradio
-dash
 
 # notebook / Jupyter
 ipykernel

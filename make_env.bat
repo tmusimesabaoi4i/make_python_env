@@ -6,6 +6,7 @@ set "ENV_NAME="
 set "ENV_DIR="
 set "REQ_FILE=%~dp0requirements_basic.txt"
 set "PYTHON_CMD="
+set "PROXY="
 
 :parse_args
 if "%~1"=="" goto parsed
@@ -29,6 +30,12 @@ if /I "%~1"=="--requirements" (
 )
 if /I "%~1"=="--python" (
     set "PYTHON_CMD=%~2"
+    shift
+    shift
+    goto parse_args
+)
+if /I "%~1"=="--proxy" (
+    set "PROXY=%~2"
     shift
     shift
     goto parse_args
@@ -59,12 +66,16 @@ if not defined PYTHON_CMD (
     )
 )
 
+set "PIP_PROXY_OPT="
+if defined PROXY set "PIP_PROXY_OPT=--proxy %PROXY%"
+
 echo.
 echo ============================================================
 echo Create Python virtual environment
-echo   Name : %ENV_NAME%
-echo   Path : %ENV_DIR%
-echo   Req  : %REQ_FILE%
+echo   Name  : %ENV_NAME%
+echo   Path  : %ENV_DIR%
+echo   Req   : %REQ_FILE%
+if defined PROXY echo   Proxy : %PROXY%
 echo ============================================================
 echo.
 
@@ -85,17 +96,17 @@ if errorlevel 1 (
 
 set "VENV_PY=%ENV_DIR%\Scripts\python.exe"
 
-"%VENV_PY%" -m pip install --upgrade pip setuptools wheel
+"%VENV_PY%" -m pip install --upgrade %PIP_PROXY_OPT% pip setuptools wheel
 if errorlevel 1 (
     echo [ERROR] Failed to upgrade pip/setuptools/wheel.
     exit /b 1
 )
 
 if exist "%REQ_FILE%" (
-    "%VENV_PY%" -m pip install --upgrade -r "%REQ_FILE%"
+    "%VENV_PY%" -m pip install --upgrade %PIP_PROXY_OPT% -r "%REQ_FILE%"
 ) else (
     echo [WARN] requirements_basic.txt was not found. Installing fallback packages.
-    "%VENV_PY%" -m pip install --upgrade requests beautifulsoup4 lxml tqdm python-dotenv tenacity pandas numpy openpyxl xlsxwriter duckdb pyarrow matplotlib jinja2 markdownify pypdf pymupdf pdfplumber python-docx python-pptx ipykernel jupyterlab
+    "%VENV_PY%" -m pip install --upgrade %PIP_PROXY_OPT% requests beautifulsoup4 lxml tqdm python-dotenv tenacity pandas numpy openpyxl xlsxwriter duckdb pyarrow matplotlib jinja2 markdownify pypdf pymupdf pdfplumber python-docx python-pptx ipykernel jupyterlab
 )
 
 if errorlevel 1 (
@@ -129,10 +140,12 @@ echo   --name ENV_NAME              Required. Virtual environment name.
 echo   --dir  PATH                  Optional. Environment path. Default: current folder\ENV_NAME
 echo   --requirements PATH          Optional. Requirements file. Default: requirements_basic.txt next to this bat.
 echo   --python "COMMAND"           Optional. Python command. Example: "py -3.12" or "C:\Python312\python.exe"
+echo   --proxy URL                  Optional. Proxy URL for pip. Example: http://proxy.example.com:8080
 echo.
 echo Examples:
 echo   make_env.bat --name YYY
 echo   make_env.bat --name YYY --dir C:\work\venvs\YYY
 echo   make_env.bat --name YYY --python "py -3.12"
+echo   make_env.bat --name YYY --proxy http://proxy.example.com:8080
 echo.
 exit /b 1
